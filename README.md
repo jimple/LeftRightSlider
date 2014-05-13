@@ -1,6 +1,17 @@
 LeftRightSlider
 ===============
 
+/* ***********************************************************
+add by jimple
+在原作（https://github.com/heroims/LeftRightSlider）基础上进行了如下修改：
+1、左右滑开时，主视图添加了一个半透明的遮罩。
+2、修改了代码，现在可以在主视图添加一个正常的UINavigationController了。
+
+以下是原作的说明，非常感谢作者 @heroims 
+
+*********************************************************** */
+
+
 ![Screenshot1](http://i.imgur.com/N6q2Uk8.gif "Screenshot1") 
 ![Screenshot2](http://i.imgur.com/98Gwauw.gif "Screenshot2")
 
