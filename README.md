@@ -5,7 +5,7 @@ LeftRightSlider
 
 add by jimple
 
-在原作（https://github.com/heroims/LeftRightSlider）基础上进行了如下修改：
+在原作（  https://github.com/heroims/LeftRightSlider  ）基础上进行了如下修改：
 
 1、左右滑开时，主视图添加了一个半透明的遮罩。
 
