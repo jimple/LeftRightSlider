@@ -11,6 +11,10 @@ add by jimple
 
 2、修改了代码，现在可以在主视图添加一个正常的UINavigationController了。
 
+3、增加 canMoveWithGesture 属性，方便外部停用左右滑动功能。
+
+4、增加对left/right视图的检测，这样当一开始没有设置左/右视图时，对应滑动打开自动屏蔽不可用。
+
 
 以下是原作的说明，非常感谢作者 @heroims 
 
