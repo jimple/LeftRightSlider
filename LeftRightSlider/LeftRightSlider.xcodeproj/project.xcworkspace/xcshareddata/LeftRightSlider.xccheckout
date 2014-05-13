@@ -5,34 +5,34 @@
 	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
 	<false/>
 	<key>IDESourceControlProjectIdentifier</key>
-	<string>B2B9F996-0A28-4402-8843-62EB27736233</string>
+	<string>78AE54FD-7C12-49C0-A22A-9E85BF65F1FD</string>
 	<key>IDESourceControlProjectName</key>
 	<string>LeftRightSlider</string>
 	<key>IDESourceControlProjectOriginsDictionary</key>
 	<dict>
-		<key>0433B373-F5B3-4D0D-80CE-91EDED184280</key>
-		<string>https://github.com/heroims/LeftRightSlider.git</string>
+		<key>15744E90-9FBD-484B-8BC7-96D3FFDD5974</key>
+		<string>https://github.com/jimple/LeftRightSlider.git</string>
 	</dict>
 	<key>IDESourceControlProjectPath</key>
 	<string>LeftRightSlider/LeftRightSlider.xcodeproj/project.xcworkspace</string>
 	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
 	<dict>
-		<key>0433B373-F5B3-4D0D-80CE-91EDED184280</key>
+		<key>15744E90-9FBD-484B-8BC7-96D3FFDD5974</key>
 		<string>../../..</string>
 	</dict>
 	<key>IDESourceControlProjectURL</key>
-	<string>https://github.com/heroims/LeftRightSlider.git</string>
+	<string>https://github.com/jimple/LeftRightSlider.git</string>
 	<key>IDESourceControlProjectVersion</key>
 	<integer>110</integer>
 	<key>IDESourceControlProjectWCCIdentifier</key>
-	<string>0433B373-F5B3-4D0D-80CE-91EDED184280</string>
+	<string>15744E90-9FBD-484B-8BC7-96D3FFDD5974</string>
 	<key>IDESourceControlProjectWCConfigurations</key>
 	<array>
 		<dict>
 			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
 			<string>public.vcs.git</string>
 			<key>IDESourceControlWCCIdentifierKey</key>
-			<string>0433B373-F5B3-4D0D-80CE-91EDED184280</string>
+			<string>15744E90-9FBD-484B-8BC7-96D3FFDD5974</string>
 			<key>IDESourceControlWCCName</key>
 			<string>LeftRightSlider</string>
 		</dict>

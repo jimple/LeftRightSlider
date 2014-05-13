@@ -6,13 +6,13 @@
 //  Copyright (c) 2013年 Zhao Yiqi. All rights reserved.
 //
 
-#import "RightVC.h"
+#import "RightViewController.h"
 
-@interface RightVC ()
+@interface RightViewController ()
 
 @end
 
-@implementation RightVC
+@implementation RightViewController
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -27,7 +27,7 @@
 {
     [super viewDidLoad];
     
-    UIImageView *imgV=[[UIImageView alloc] initWithFrame:[UIScreen mainScreen].bounds];
+    UIImageView *imgV=[[UIImageView alloc] initWithFrame:self.view.bounds];
     [imgV setImage:[UIImage imageNamed:@"2222"]];
     [self.view addSubview:imgV];
 	// Do any additional setup after loading the view.

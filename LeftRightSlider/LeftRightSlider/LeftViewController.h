@@ -8,6 +8,6 @@
 
 #import <UIKit/UIKit.h>
 
-@interface LeftVC : UIViewController
+@interface LeftViewController : UIViewController
 
 @end

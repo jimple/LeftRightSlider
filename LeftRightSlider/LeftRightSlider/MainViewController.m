@@ -66,15 +66,13 @@
 }
 
 -(void)leftItemClick{
-    [[SliderViewController sharedSliderController] showLeftViewController];
+    [[SliderViewController sharedSliderController] leftItemClick];
 }
 -(void)rightItemClick{
-    [[SliderViewController sharedSliderController] showRightViewController];
+    [[SliderViewController sharedSliderController] rightItemClick];
 }
 -(void)btnNextClick:(id)sender{
-    ViewController1 *sssss=[[ViewController1 alloc] init];
-    sssss.vvvvvv=self;
-    [[SliderViewController sharedSliderController].navigationController pushViewController:sssss animated:YES];
+    [[SliderViewController sharedSliderController].navigationController pushViewController:[[ViewController1 alloc] init] animated:YES];
 }
 
 - (void)didReceiveMemoryWarning

@@ -7,7 +7,8 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "SliderContentViewController.h"
 
-@interface ViewController2 : UIViewController
+@interface ViewController2 : SliderContentViewController
 
 @end

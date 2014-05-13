@@ -7,7 +7,9 @@
 //
 
 #import "AppDelegate.h"
-
+#import "NaviViewController.h"
+#import "LeftViewController.h"
+#import "RightViewController.h"
 
 @implementation AppDelegate
 
@@ -18,18 +20,16 @@
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     // Override point for customization after application launch.
     
-    [SliderViewController sharedSliderController].LeftVC=[[LeftVC alloc] init];
-    [SliderViewController sharedSliderController].RightVC=[[RightVC alloc] init];
-    [SliderViewController sharedSliderController].RightSContentOffset=260;
-    [SliderViewController sharedSliderController].RightSContentScale=0.68;
-    [SliderViewController sharedSliderController].RightSJudgeOffset=160;
+    [SliderViewController sharedSliderController].mainVCClassName = @"MainViewController";
+    
+    [SliderViewController sharedSliderController].LeftVC=[[LeftViewController alloc] init];
+    [SliderViewController sharedSliderController].RightVC=[[RightViewController alloc] init];
+    
+    [SliderViewController sharedSliderController].LeftSContentScale=1.0;
+    [SliderViewController sharedSliderController].RightSContentScale=1.0;
+    
+    self.window.rootViewController = [[UINavigationController alloc] initWithRootViewController:[SliderViewController sharedSliderController]];
 
-    LRNavigationController *nav=[[LRNavigationController alloc] initWithRootViewController:[SliderViewController sharedSliderController]];
-    nav.contentScale=1;
-    nav.judgeOffset=100;
-    nav.startX=-200;
-
-    self.window.rootViewController = nav;
 
     self.window.backgroundColor = [UIColor whiteColor];
     [self.window makeKeyAndVisible];

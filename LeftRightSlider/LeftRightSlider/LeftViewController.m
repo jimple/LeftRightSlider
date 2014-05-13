@@ -6,14 +6,14 @@
 //  Copyright (c) 2013年 Zhao Yiqi. All rights reserved.
 //
 
-#import "LeftVC.h"
+#import "LeftViewController.h"
 #import "SliderViewController.h"
 
-@interface LeftVC ()<UITableViewDataSource,UITableViewDelegate>
+@interface LeftViewController ()<UITableViewDataSource,UITableViewDelegate>
 
 @end
 
-@implementation LeftVC
+@implementation LeftViewController
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -28,7 +28,7 @@
 {
     [super viewDidLoad];
     
-    UIImageView *imgV=[[UIImageView alloc] initWithFrame:[UIScreen mainScreen].bounds];
+    UIImageView *imgV=[[UIImageView alloc] initWithFrame:self.view.bounds];
     [imgV setImage:[UIImage imageNamed:@"3333"]];
     [self.view addSubview:imgV];
     
@@ -90,6 +90,9 @@
             [[SliderViewController sharedSliderController] showContentControllerWithModel:@"MainViewController"];
             break;
         case 1:
+            [[SliderViewController sharedSliderController] showContentControllerWithModel:@"NaviViewController"];
+            break;
+        case 2:
             [[SliderViewController sharedSliderController] showContentControllerWithModel:@"RightViewController"];
             break;
         default:

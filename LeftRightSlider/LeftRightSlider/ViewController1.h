@@ -9,8 +9,9 @@
 #import <UIKit/UIKit.h>
 #import "ViewController2.h"
 
-@interface ViewController1 : UIViewController
+#import "SliderContentViewController.h"
 
-@property(nonatomic,retain)UIViewController *vvvvvv;
+
+@interface ViewController1 : SliderContentViewController
 
 @end

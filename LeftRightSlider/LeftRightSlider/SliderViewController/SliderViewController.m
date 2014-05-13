@@ -7,7 +7,9 @@
 //
 
 #import "SliderViewController.h"
-#import <sys/utsname.h>
+
+static CGFloat kBlackCoverMaxAlpha = 0.6f;
+
 
 typedef NS_ENUM(NSInteger, RMoveDirection) {
     RMoveDirectionLeft = 0,
@@ -18,51 +20,42 @@ typedef NS_ENUM(NSInteger, RMoveDirection) {
     UIView *_mainContentView;
     UIView *_leftSideView;
     UIView *_rightSideView;
+    UIView *_blackCoverView;
     
     NSMutableDictionary *_controllersDict;
     
     UITapGestureRecognizer *_tapGestureRec;
     UIPanGestureRecognizer *_panGestureRec;
+    UIPanGestureRecognizer *_panOnBlackCoverViewGestureRec;
     
-    BOOL showingLeft;
-    BOOL showingRight;
+    BOOL _showLeftSideView;
+    BOOL _showRightSideView;
 }
 
 @end
 
 @implementation SliderViewController
 
--(void)dealloc{
 #if __has_feature(objc_arc)
-    _mainContentView = nil;
-    _leftSideView = nil;
-    _rightSideView = nil;
-    
-    _controllersDict = nil;
-    
-    _tapGestureRec = nil;
-    _panGestureRec = nil;
-    
-    _LeftVC = nil;
-    _RightVC = nil;
-    _MainVC = nil;
 #else
+-(void)dealloc{
     [_mainContentView release];
     [_leftSideView release];
     [_rightSideView release];
+    [_blackCoverView release];
     
     [_controllersDict release];
     
     [_tapGestureRec release];
     [_panGestureRec release];
+    [_panOnBlackCoverViewGestureRec release];
     
-    [_LeftVC release];
-    [_RightVC release];
+    [_leftVC release];
+    [_rightVC release];
     [_MainVC release];
     [super dealloc];
-#endif
-
 }
+#endif
 
 + (SliderViewController*)sharedSliderController
 {
@@ -73,24 +66,6 @@ typedef NS_ENUM(NSInteger, RMoveDirection) {
     });
     
     return sharedSVC;
-}
-
-- (id)initWithCoder:(NSCoder *)decoder {
-	if ((self = [super initWithCoder:decoder])) {
-        _LeftSContentOffset=160;
-        _RightSContentOffset=160;
-        _LeftSContentScale=0.85;
-        _RightSContentScale=0.85;
-        _LeftSJudgeOffset=100;
-        _RightSJudgeOffset=100;
-        _LeftSOpenDuration=0.4;
-        _RightSOpenDuration=0.4;
-        _LeftSCloseDuration=0.3;
-        _RightSCloseDuration=0.3;
-        _canShowLeft=YES;
-        _canShowRight=YES;
-	}
-	return self;
 }
 
 - (id)init{
@@ -105,8 +80,10 @@ typedef NS_ENUM(NSInteger, RMoveDirection) {
         _RightSOpenDuration=0.4;
         _LeftSCloseDuration=0.3;
         _RightSCloseDuration=0.3;
-        _canShowLeft=YES;
-        _canShowRight=YES;
+        
+        _showLeftSideView = NO;
+        _showRightSideView = NO;
+        _canMoveWithGesture = YES;
     }
         
     return self;
@@ -114,32 +91,30 @@ typedef NS_ENUM(NSInteger, RMoveDirection) {
 
 - (void)viewDidLoad
 {
+    NSAssert((_mainVCClassName && (_mainVCClassName.length > 0)), @"\n\n\n没有设置主ViewController类名\n\n");
+    
     [super viewDidLoad];
     
     self.navigationController.navigationBarHidden=YES;
 
-    _controllersDict = [[NSMutableDictionary alloc] init];
+    _controllersDict = [NSMutableDictionary dictionary];
     
     [self initSubviews];
-
+    
     [self initChildControllers:_LeftVC rightVC:_RightVC];
     
-    [self showContentControllerWithModel:_MainVC!=nil?NSStringFromClass([_MainVC class]):@"MainViewController"];
+    [self showContentControllerWithModel:_mainVCClassName];
     
-    if((self.wantsFullScreenLayout=_MainVC.wantsFullScreenLayout)){
-        _rightSideView.frame=[UIScreen mainScreen].bounds;
-        _leftSideView.frame=[UIScreen mainScreen].bounds;
-        _mainContentView.frame=[UIScreen mainScreen].bounds;
-    }
-
     _tapGestureRec = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(closeSideBar)];
     _tapGestureRec.delegate=self;
-    [self.view addGestureRecognizer:_tapGestureRec];
+    [_blackCoverView addGestureRecognizer:_tapGestureRec];
     _tapGestureRec.enabled = NO;
     
     _panGestureRec = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(moveViewWithGesture:)];
     [_mainContentView addGestureRecognizer:_panGestureRec];
     
+    _panOnBlackCoverViewGestureRec = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(moveViewWithGesture:)];
+    [_blackCoverView addGestureRecognizer:_panOnBlackCoverViewGestureRec];
 }
 
 #pragma mark - Init
@@ -148,26 +123,45 @@ typedef NS_ENUM(NSInteger, RMoveDirection) {
 {
     _rightSideView = [[UIView alloc] initWithFrame:self.view.bounds];
     [self.view addSubview:_rightSideView];
-    
+
     _leftSideView = [[UIView alloc] initWithFrame:self.view.bounds];
     [self.view addSubview:_leftSideView];
     
     _mainContentView = [[UIView alloc] initWithFrame:self.view.bounds];
     [self.view addSubview:_mainContentView];
 
+    _blackCoverView = [[UIView alloc] initWithFrame:self.view.bounds];
+    [self.view addSubview:_blackCoverView];
+    _blackCoverView.backgroundColor = [UIColor colorWithWhite:0.0f alpha:1.0f];
+    _blackCoverView.hidden = YES;
 }
 
 - (void)initChildControllers:(UIViewController*)leftVC rightVC:(UIViewController*)rightVC
 {
-    if (_canShowRight&&rightVC!=nil) {
-        [self addChildViewController:rightVC];
-        rightVC.view.frame=CGRectMake(0, 0, rightVC.view.frame.size.width, rightVC.view.frame.size.height);
-        [_rightSideView addSubview:rightVC.view];
-    }
-    if (_canShowLeft&&leftVC!=nil) {
+    if (leftVC)
+    {
         [self addChildViewController:leftVC];
         leftVC.view.frame=CGRectMake(0, 0, leftVC.view.frame.size.width, leftVC.view.frame.size.height);
         [_leftSideView addSubview:leftVC.view];
+        
+        _showLeftSideView = YES;
+    }
+    else
+    {
+        _showLeftSideView = NO;
+    }
+    
+    if (rightVC)
+    {
+        [self addChildViewController:rightVC];
+        rightVC.view.frame=CGRectMake(0, 0, rightVC.view.frame.size.width, rightVC.view.frame.size.height);
+        [_rightSideView addSubview:rightVC.view];
+        
+        _showRightSideView = YES;
+    }
+    else
+    {
+        _showRightSideView = NO;
     }
 }
 
@@ -202,54 +196,50 @@ typedef NS_ENUM(NSInteger, RMoveDirection) {
     self.MainVC=controller;
 }
 
-- (void)showLeftViewController
+- (void)leftItemClick
 {
-    if (showingLeft) {
-        [self closeSideBar];
-        return;
-    }
-    if (!_canShowLeft||_LeftVC==nil) {
-        return;
-    }
-    CGAffineTransform conT = [self transformWithDirection:RMoveDirectionRight];
-    
-    [self.view sendSubviewToBack:_rightSideView];
-    [self configureViewShadowWithDirection:RMoveDirectionRight];
-    
-    [UIView animateWithDuration:_LeftSOpenDuration
-                     animations:^{
-                         _mainContentView.transform = conT;
-                     }
-                     completion:^(BOOL finished) {
-                         _tapGestureRec.enabled = YES;
-                         showingLeft=YES;
-                         _MainVC.view.userInteractionEnabled=NO;
-                     }];
+    if (_showLeftSideView)
+    {
+        CGAffineTransform conT = [self transformWithDirection:RMoveDirectionRight];
+        
+        [self.view sendSubviewToBack:_rightSideView];
+        [self configureViewShadowWithDirection:RMoveDirectionRight];
+        
+        [UIView animateWithDuration:_LeftSOpenDuration
+                         animations:^{
+                             _mainContentView.transform = conT;
+                             
+                             _blackCoverView.hidden = NO;
+                             _blackCoverView.alpha = kBlackCoverMaxAlpha;
+                             _blackCoverView.frame = _mainContentView.frame;
+                         }
+                         completion:^(BOOL finished) {
+                             _tapGestureRec.enabled = YES;
+                         }];
+    }else{}
 }
 
-- (void)showRightViewController
+- (void)rightItemClick
 {
-    if (showingRight) {
-        [self closeSideBar];
-        return;
-    }
-    if (!_canShowRight||_RightVC==nil) {
-        return;
-    }
-    CGAffineTransform conT = [self transformWithDirection:RMoveDirectionLeft];
-    
-    [self.view sendSubviewToBack:_leftSideView];
-    [self configureViewShadowWithDirection:RMoveDirectionLeft];
-    
-    [UIView animateWithDuration:_RightSOpenDuration
-                     animations:^{
-                         _mainContentView.transform = conT;
-                     }
-                     completion:^(BOOL finished) {
-                         _tapGestureRec.enabled = YES;
-                         showingRight=YES;
-                         _MainVC.view.userInteractionEnabled=NO;
-                     }];
+    if (_showRightSideView)
+    {
+        CGAffineTransform conT = [self transformWithDirection:RMoveDirectionLeft];
+        
+        [self.view sendSubviewToBack:_leftSideView];
+        [self configureViewShadowWithDirection:RMoveDirectionLeft];
+        
+        [UIView animateWithDuration:_RightSOpenDuration
+                         animations:^{
+                             _mainContentView.transform = conT;
+                             
+                             _blackCoverView.hidden = NO;
+                             _blackCoverView.alpha = kBlackCoverMaxAlpha;
+                             _blackCoverView.frame = _mainContentView.frame;
+                         }
+                         completion:^(BOOL finished) {
+                             _tapGestureRec.enabled = YES;
+                         }];
+    }else{}
 }
 
 - (void)closeSideBar
@@ -258,17 +248,22 @@ typedef NS_ENUM(NSInteger, RMoveDirection) {
     [UIView animateWithDuration:_mainContentView.transform.tx==_LeftSContentOffset?_LeftSCloseDuration:_RightSCloseDuration
                      animations:^{
                          _mainContentView.transform = oriT;
+                         _blackCoverView.alpha = 0.0f;
+                         _blackCoverView.frame = _mainContentView.frame;
                      }
                      completion:^(BOOL finished) {
                          _tapGestureRec.enabled = NO;
-                         showingRight=NO;
-                         showingLeft=NO;
-                         _MainVC.view.userInteractionEnabled=YES;
+                         _blackCoverView.hidden = YES;
                      }];
 }
 
 - (void)moveViewWithGesture:(UIPanGestureRecognizer *)panGes
 {
+    if (!_canMoveWithGesture)
+    {
+        return;
+    }else{}
+    
     static CGFloat currentTranslateX;
     if (panGes.state == UIGestureRecognizerStateBegan)
     {
@@ -279,13 +274,11 @@ typedef NS_ENUM(NSInteger, RMoveDirection) {
         CGFloat transX = [panGes translationInView:_mainContentView].x;
         transX = transX + currentTranslateX;
         
-        CGFloat sca=0;
-        if (transX > 0)
+        CGFloat sca;
+        BOOL isTransformView = NO;
+        CGFloat blackCoverAlpha = 0.0f;
+        if ((transX > 0) && _showLeftSideView)
         {
-            if (!_canShowLeft||_LeftVC==nil) {
-                return;
-            }
-
             [self.view sendSubviewToBack:_rightSideView];
             [self configureViewShadowWithDirection:RMoveDirectionRight];
             
@@ -297,13 +290,11 @@ typedef NS_ENUM(NSInteger, RMoveDirection) {
             {
                 sca = _LeftSContentScale;
             }
+            blackCoverAlpha = MIN((transX/_LeftSContentOffset * kBlackCoverMaxAlpha), kBlackCoverMaxAlpha);
+            isTransformView = YES;
         }
-        else    //transX < 0
+        else if ((transX < 0) && _showRightSideView)
         {
-            if (!_canShowRight||_RightVC==nil) {
-                return;
-            }
-
             [self.view sendSubviewToBack:_leftSideView];
             [self configureViewShadowWithDirection:RMoveDirectionLeft];
             
@@ -315,49 +306,58 @@ typedef NS_ENUM(NSInteger, RMoveDirection) {
             {
                 sca = _RightSContentScale;
             }
+            blackCoverAlpha = MIN((-transX/_RightSContentOffset * kBlackCoverMaxAlpha), kBlackCoverMaxAlpha);
+            isTransformView = YES;
         }
-        CGAffineTransform transS = CGAffineTransformMakeScale(sca, sca);
-        CGAffineTransform transT = CGAffineTransformMakeTranslation(transX, 0);
+        else
+        {
+            sca = 0.0f;
+            isTransformView = NO;
+        }
         
-        CGAffineTransform conT = CGAffineTransformConcat(transT, transS);
-        
-        _mainContentView.transform = conT;
+        if (isTransformView)
+        {
+            CGAffineTransform transS = CGAffineTransformMakeScale(1.0, sca);
+            CGAffineTransform transT = CGAffineTransformMakeTranslation(transX, 0);
+            
+            CGAffineTransform conT = CGAffineTransformConcat(transT, transS);
+            
+            _mainContentView.transform = conT;
+            
+            _blackCoverView.hidden = NO;
+            _blackCoverView.alpha = blackCoverAlpha;
+            _blackCoverView.frame = _mainContentView.frame;
+        }else{}
     }
     else if (panGes.state == UIGestureRecognizerStateEnded)
     {
         CGFloat panX = [panGes translationInView:_mainContentView].x;
         CGFloat finalX = currentTranslateX + panX;
-        if (finalX > _LeftSJudgeOffset)
+        if ((finalX > _LeftSJudgeOffset) && _showLeftSideView)
         {
-            if (!_canShowLeft||_LeftVC==nil) {
-                return;
-            }
-
             CGAffineTransform conT = [self transformWithDirection:RMoveDirectionRight];
             [UIView beginAnimations:nil context:nil];
             _mainContentView.transform = conT;
+            
+            _blackCoverView.alpha = kBlackCoverMaxAlpha;
+            _blackCoverView.frame = _mainContentView.frame;
+            
             [UIView commitAnimations];
             
-            showingLeft=YES;
-            _MainVC.view.userInteractionEnabled=NO;
-
             _tapGestureRec.enabled = YES;
             return;
         }
-        if (finalX < -_RightSJudgeOffset)
+        if ((finalX < -_RightSJudgeOffset) && _showRightSideView)
         {
-            if (!_canShowRight||_RightVC==nil) {
-                return;
-            }
-
             CGAffineTransform conT = [self transformWithDirection:RMoveDirectionLeft];
             [UIView beginAnimations:nil context:nil];
             _mainContentView.transform = conT;
+            
+            _blackCoverView.alpha = kBlackCoverMaxAlpha;
+            _blackCoverView.frame = _mainContentView.frame;
+            
             [UIView commitAnimations];
             
-            showingRight=YES;
-            _MainVC.view.userInteractionEnabled=NO;
-
             _tapGestureRec.enabled = YES;
             return;
         }
@@ -366,12 +366,11 @@ typedef NS_ENUM(NSInteger, RMoveDirection) {
             CGAffineTransform oriT = CGAffineTransformIdentity;
             [UIView beginAnimations:nil context:nil];
             _mainContentView.transform = oriT;
+
             [UIView commitAnimations];
             
-            showingRight=NO;
-            showingLeft=NO;
-            _MainVC.view.userInteractionEnabled=YES;
             _tapGestureRec.enabled = NO;
+            _blackCoverView.hidden = YES;
         }
     }
 }
@@ -396,39 +395,14 @@ typedef NS_ENUM(NSInteger, RMoveDirection) {
     }
     
     CGAffineTransform transT = CGAffineTransformMakeTranslation(translateX, 0);
-    CGAffineTransform scaleT = CGAffineTransformMakeScale(transcale, transcale);
+    CGAffineTransform scaleT = CGAffineTransformMakeScale(1.0, transcale);
     CGAffineTransform conT = CGAffineTransformConcat(transT, scaleT);
     
     return conT;
 }
 
-- (NSString*)deviceWithNumString{
-    struct utsname systemInfo;
-    uname(&systemInfo);
-    NSString *deviceString = [NSString stringWithCString:systemInfo.machine encoding:NSUTF8StringEncoding];
-    
-    @try {
-        return [deviceString stringByReplacingOccurrencesOfString:@"," withString:@""];
-    }
-    @catch (NSException *exception) {
-        return deviceString;
-    }
-    @finally {
-    }
-}
-
 - (void)configureViewShadowWithDirection:(RMoveDirection)direction
 {
-    if ([[self deviceWithNumString] hasPrefix:@"iPhone"]&&[[[self deviceWithNumString] stringByReplacingOccurrencesOfString:@"iPhone" withString:@""] floatValue]<40) {
-        return;
-    }
-    if ([[self deviceWithNumString] hasPrefix:@"iPod"]&&[[[self deviceWithNumString] stringByReplacingOccurrencesOfString:@"iPod" withString:@""] floatValue]<40) {
-        return;
-    }
-    if ([[self deviceWithNumString] hasPrefix:@"iPad"]&&[[[self deviceWithNumString] stringByReplacingOccurrencesOfString:@"iPad" withString:@""] floatValue]<25) {
-        return;
-    }
-
     CGFloat shadowW;
     switch (direction)
     {
@@ -441,18 +415,12 @@ typedef NS_ENUM(NSInteger, RMoveDirection) {
         default:
             break;
     }
+    
     _mainContentView.layer.shadowOffset = CGSizeMake(shadowW, 1.0);
     _mainContentView.layer.shadowColor = [UIColor blackColor].CGColor;
     _mainContentView.layer.shadowOpacity = 0.8f;
 }
 
 
-- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch
-{    
-    if ([NSStringFromClass([touch.view class]) isEqualToString:@"UITableViewCellContentView"]) {
-        return NO;
-    }
-    return  YES;
-}
 
 @end

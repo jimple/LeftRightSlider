@@ -10,6 +10,8 @@
 
 @interface ViewController1 ()
 
+//@property (nonatomic, strong) UIPanGestureRecognizer *panGestureRec;
+
 @end
 
 @implementation ViewController1
@@ -27,8 +29,6 @@
 {
     [super viewDidLoad];
     
-    self.wantsFullScreenLayout=YES;
-
     self.view.backgroundColor=[UIColor redColor];
     
     UIButton *btnNext=[UIButton buttonWithType:UIButtonTypeCustom];
@@ -49,36 +49,21 @@
     [btnPop addTarget:self action:@selector(btnPopClick:) forControlEvents:UIControlEventTouchUpInside];
     [self.view addSubview:btnPop];
 
-    UIButton *btnChangeLast=[UIButton buttonWithType:UIButtonTypeCustom];
-    btnChangeLast.layer.borderColor=[[UIColor whiteColor] CGColor];
-    btnChangeLast.layer.borderWidth=2;
-    [btnChangeLast setTitle:@"ChangeLast" forState:UIControlStateNormal];
-    [btnChangeLast setFrame:CGRectMake(0, 0, 100, 50)];
-    btnChangeLast.center=CGPointMake(self.view.center.x, self.view.center.y+60);
-    [btnChangeLast addTarget:self action:@selector(btnChangeLastClick) forControlEvents:UIControlEventTouchUpInside];
-    [self.view addSubview:btnChangeLast];
-
-    
 	// Do any additional setup after loading the view.
+    
+    
+//    _panGestureRec = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(moveViewWithGesture:)];
+//    [self.view addGestureRecognizer:_panGestureRec];
+    
 }
 
--(void)btnChangeLastClick{
-    UIView *view=[[UIView alloc] initWithFrame:CGRectMake(0, 0, 60, 60)];
-    view.backgroundColor=[UIColor redColor];
-    view.center=CGPointMake(_vvvvvv.view.center.x, _vvvvvv.view.center.y+100);
-    [_vvvvvv.view addSubview:view];
-    
-    UIAlertView *alter=[[UIAlertView alloc] initWithTitle:@"" message:@"success" delegate:nil cancelButtonTitle:@"ok" otherButtonTitles:nil, nil];
-    [alter show];
-}
 
 -(void)btnPopClick:(id)sender{
-    [(LRNavigationController*)self.navigationController popViewControllerWithLRAnimated];
+    [self.navigationController popViewControllerAnimated:YES];
 }
 
 -(void)btnNextClick:(id)sender{
-//    [self.navigationController pushViewController:[[ViewController2 alloc] init] animated:YES];
-    [(LRNavigationController*)self.navigationController pushViewControllerWithLRAnimated:[[ViewController2 alloc] init]];
+    [self.navigationController pushViewController:[[ViewController2 alloc] init] animated:YES];
 }
 
 - (void)didReceiveMemoryWarning
@@ -86,5 +71,28 @@
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
 }
+
+- (void)moveViewWithGesture:(UIPanGestureRecognizer *)panGes
+{
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 @end

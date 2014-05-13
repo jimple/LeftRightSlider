@@ -8,22 +8,6 @@
 
 #import "ViewController2.h"
 
-@interface HitView : UIScrollView
-
-@end
-
-@implementation HitView
-
--(UIView *)hitTest:(CGPoint)point withEvent:(UIEvent *)event{
-    if (point.x<50) {
-        return self.superview;
-    }
-    
-    return [super hitTest:point withEvent:event];
-}
-
-@end
-
 @interface ViewController2 ()
 
 @end
@@ -44,14 +28,6 @@
     [super viewDidLoad];
 	// Do any additional setup after loading the view.
     self.view.backgroundColor=[UIColor purpleColor];
-    self.wantsFullScreenLayout=YES;
-
-    
-    UIScrollView *bgV=[[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, 320, 300)];
-    bgV.contentSize=CGSizeMake(320*2, 300*2);
-    bgV.backgroundColor=[UIColor orangeColor];
-    bgV.center=self.view.center;
-    [self.view addSubview:bgV];
     
     UIButton *btnPop=[UIButton buttonWithType:UIButtonTypeCustom];
     btnPop.layer.borderColor=[[UIColor whiteColor] CGColor];

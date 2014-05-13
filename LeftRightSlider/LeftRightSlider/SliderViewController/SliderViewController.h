@@ -10,11 +10,11 @@
 
 @interface SliderViewController : UIViewController
 
+@property (nonatomic, copy) NSString *mainVCClassName;
+
 @property(nonatomic,strong)UIViewController *LeftVC;
 @property(nonatomic,strong)UIViewController *RightVC;
 @property(nonatomic,strong)UIViewController *MainVC;
-
-@property(nonatomic,strong)NSMutableDictionary *controllersDict;
 
 @property(nonatomic,assign)float LeftSContentOffset;
 @property(nonatomic,assign)float RightSContentOffset;
@@ -31,13 +31,15 @@
 @property(nonatomic,assign)float LeftSCloseDuration;
 @property(nonatomic,assign)float RightSCloseDuration;
 
-@property(nonatomic,assign)BOOL canShowLeft;
-@property(nonatomic,assign)BOOL canShowRight;
+@property (nonatomic, assign) BOOL canMoveWithGesture;
 
 + (SliderViewController*)sharedSliderController;
 
 - (void)showContentControllerWithModel:(NSString*)className;
-- (void)showLeftViewController;
-- (void)showRightViewController;
+- (void)leftItemClick;
+- (void)rightItemClick;
+
+
+- (void)moveViewWithGesture:(UIPanGestureRecognizer *)panGes;
 
 @end
